@@ -28,6 +28,7 @@ bin/
 
 ### Build And Runtime ###
 target/
+dados/*.ser
 *.class
 *.war
 *.ear
