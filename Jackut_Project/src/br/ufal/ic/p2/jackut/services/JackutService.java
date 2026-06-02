@@ -1,6 +1,9 @@
 package br.ufal.ic.p2.jackut.services;
 
+import br.ufal.ic.p2.jackut.exceptions.AmigoJaAdicionadoException;
+import br.ufal.ic.p2.jackut.exceptions.AmigoPendenteException;
 import br.ufal.ic.p2.jackut.exceptions.AtributoNaoPreenchidoException;
+import br.ufal.ic.p2.jackut.exceptions.AutoAmizadeException;
 import br.ufal.ic.p2.jackut.exceptions.ContaExistenteException;
 import br.ufal.ic.p2.jackut.exceptions.LoginInvalidoException;
 import br.ufal.ic.p2.jackut.exceptions.LoginOuSenhaInvalidosException;
@@ -12,6 +15,7 @@ import br.ufal.ic.p2.jackut.models.Usuario;
 import br.ufal.ic.p2.jackut.persistence.PersistenciaService;
 import br.ufal.ic.p2.jackut.repositories.SessaoRepository;
 import br.ufal.ic.p2.jackut.repositories.UsuarioRepository;
+import java.util.List;
 
 public class JackutService {
 
@@ -71,17 +75,59 @@ public class JackutService {
     }
 
     public void editarPerfil(String id, String atributo, String valor) {
-        Sessao sessao = sessaoRepository.buscarPorId(id);
-        if (sessao == null) {
+        Usuario usuario = buscarUsuarioPorSessao(id);
+        usuario.editarPerfil(atributo, valor);
+    }
+
+    public void adicionarAmigo(String id, String loginAmigo) {
+        Usuario usuario = buscarUsuarioPorSessao(id);
+        Usuario amigo = usuarioRepository.buscarPorLogin(loginAmigo);
+
+        if (amigo == null) {
             throw new UsuarioNaoCadastradoException();
         }
 
-        Usuario usuario = usuarioRepository.buscarPorLogin(sessao.getLoginUsuario());
+        if (usuario.getLogin().equals(loginAmigo)) {
+            throw new AutoAmizadeException();
+        }
+
+        if (usuario.ehAmigo(loginAmigo)) {
+            throw new AmigoJaAdicionadoException();
+        }
+
+        if (usuario.possuiConviteEnviado(loginAmigo)) {
+            throw new AmigoPendenteException();
+        }
+
+        if (amigo.possuiConviteEnviado(usuario.getLogin())) {
+            amigo.removerConviteEnviado(usuario.getLogin());
+            usuario.adicionarAmigoConfirmado(loginAmigo);
+            amigo.adicionarAmigoConfirmado(usuario.getLogin());
+            return;
+        }
+
+        usuario.solicitarAmizade(loginAmigo);
+    }
+
+    public boolean ehAmigo(String login, String loginAmigo) {
+        Usuario usuario = usuarioRepository.buscarPorLogin(login);
+        Usuario amigo = usuarioRepository.buscarPorLogin(loginAmigo);
+
+        if (usuario == null || amigo == null) {
+            throw new UsuarioNaoCadastradoException();
+        }
+
+        return usuario.ehAmigo(loginAmigo);
+    }
+
+    public String getAmigos(String login) {
+        Usuario usuario = usuarioRepository.buscarPorLogin(login);
         if (usuario == null) {
             throw new UsuarioNaoCadastradoException();
         }
 
-        usuario.editarPerfil(atributo, valor);
+        List<String> amigos = usuario.getAmigos();
+        return "{" + String.join(",", amigos) + "}";
     }
 
     private void validarLogin(String login) {
@@ -94,5 +140,19 @@ public class JackutService {
         if (senha == null || senha.isEmpty()) {
             throw new SenhaInvalidaException();
         }
+    }
+
+    private Usuario buscarUsuarioPorSessao(String id) {
+        Sessao sessao = sessaoRepository.buscarPorId(id);
+        if (sessao == null) {
+            throw new UsuarioNaoCadastradoException();
+        }
+
+        Usuario usuario = usuarioRepository.buscarPorLogin(sessao.getLoginUsuario());
+        if (usuario == null) {
+            throw new UsuarioNaoCadastradoException();
+        }
+
+        return usuario;
     }
 }

@@ -30,6 +30,18 @@ public class Facade {
         service.editarPerfil(id, atributo, valor);
     }
 
+    public void adicionarAmigo(String id, String amigo) {
+        service.adicionarAmigo(id, amigo);
+    }
+
+    public boolean ehAmigo(String login, String amigo) {
+        return service.ehAmigo(login, amigo);
+    }
+
+    public String getAmigos(String login) {
+        return service.getAmigos(login);
+    }
+
     public void encerrarSistema() {
         service.encerrarSistema();
     }

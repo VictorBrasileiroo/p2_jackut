@@ -19,6 +19,14 @@ A User Story 2 esta implementada:
 - editar atributos de perfil em sessao autenticada;
 - persistir os atributos editados.
 
+A User Story 3 esta implementada:
+
+- enviar convite de amizade;
+- confirmar amizade por adicao reciproca;
+- consultar amizade entre usuarios;
+- listar amigos em ordem de confirmacao;
+- persistir amizades confirmadas.
+
 ## Arquitetura
 
 O EasyAccept acessa o sistema por `br.ufal.ic.p2.jackut.Facade`. A facade e fina e delega os comandos para `services.JackutService`.
@@ -57,6 +65,16 @@ java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
 ```powershell
 java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
   br.ufal.ic.p2.jackut.Facade tests\us2_2.txt
+```
+
+```powershell
+java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
+  br.ufal.ic.p2.jackut.Facade tests\us3_1.txt
+```
+
+```powershell
+java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
+  br.ufal.ic.p2.jackut.Facade tests\us3_2.txt
 ```
 
 Ou pela `Main`:
