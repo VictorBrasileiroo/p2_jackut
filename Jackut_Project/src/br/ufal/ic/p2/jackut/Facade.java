@@ -26,6 +26,10 @@ public class Facade {
         return service.getAtributoUsuario(login, atributo);
     }
 
+    public void editarPerfil(String id, String atributo, String valor) {
+        service.editarPerfil(id, atributo, valor);
+    }
+
     public void encerrarSistema() {
         service.encerrarSistema();
     }

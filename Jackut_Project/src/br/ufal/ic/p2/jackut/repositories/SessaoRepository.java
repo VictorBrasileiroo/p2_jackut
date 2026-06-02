@@ -24,6 +24,10 @@ public class SessaoRepository {
         return sessao;
     }
 
+    public Sessao buscarPorId(String id) {
+        return sessoes.get(id);
+    }
+
     public void limpar() {
         sessoes.clear();
         proximoId = 1;

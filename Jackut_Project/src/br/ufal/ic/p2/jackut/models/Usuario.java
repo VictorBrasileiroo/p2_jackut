@@ -27,6 +27,10 @@ public class Usuario implements Serializable {
         return senha.equals(senhaInformada);
     }
 
+    public boolean possuiAtributo(String atributo) {
+        return perfil.containsKey(atributo);
+    }
+
     public String getAtributo(String atributo) {
         String valor = perfil.get(atributo);
         if (valor == null) {
@@ -34,5 +38,9 @@ public class Usuario implements Serializable {
         }
 
         return valor;
+    }
+
+    public void editarPerfil(String atributo, String valor) {
+        perfil.put(atributo, valor == null ? "" : valor);
     }
 }

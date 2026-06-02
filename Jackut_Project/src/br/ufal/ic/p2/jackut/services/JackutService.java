@@ -1,11 +1,13 @@
 package br.ufal.ic.p2.jackut.services;
 
+import br.ufal.ic.p2.jackut.exceptions.AtributoNaoPreenchidoException;
 import br.ufal.ic.p2.jackut.exceptions.ContaExistenteException;
 import br.ufal.ic.p2.jackut.exceptions.LoginInvalidoException;
 import br.ufal.ic.p2.jackut.exceptions.LoginOuSenhaInvalidosException;
 import br.ufal.ic.p2.jackut.exceptions.SenhaInvalidaException;
 import br.ufal.ic.p2.jackut.exceptions.UsuarioNaoCadastradoException;
 import br.ufal.ic.p2.jackut.models.EstadoJackut;
+import br.ufal.ic.p2.jackut.models.Sessao;
 import br.ufal.ic.p2.jackut.models.Usuario;
 import br.ufal.ic.p2.jackut.persistence.PersistenciaService;
 import br.ufal.ic.p2.jackut.repositories.SessaoRepository;
@@ -48,6 +50,10 @@ public class JackutService {
             throw new UsuarioNaoCadastradoException();
         }
 
+        if (!usuario.possuiAtributo(atributo)) {
+            throw new AtributoNaoPreenchidoException();
+        }
+
         return usuario.getAtributo(atributo);
     }
 
@@ -62,6 +68,20 @@ public class JackutService {
 
     public void encerrarSistema() {
         persistenciaService.salvar(estado);
+    }
+
+    public void editarPerfil(String id, String atributo, String valor) {
+        Sessao sessao = sessaoRepository.buscarPorId(id);
+        if (sessao == null) {
+            throw new UsuarioNaoCadastradoException();
+        }
+
+        Usuario usuario = usuarioRepository.buscarPorLogin(sessao.getLoginUsuario());
+        if (usuario == null) {
+            throw new UsuarioNaoCadastradoException();
+        }
+
+        usuario.editarPerfil(atributo, valor);
     }
 
     private void validarLogin(String login) {

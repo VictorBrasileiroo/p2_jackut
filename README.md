@@ -12,6 +12,13 @@ A User Story 1 esta implementada:
 - zerar e encerrar o sistema;
 - persistir os usuarios em arquivo relativo.
 
+A User Story 2 esta implementada:
+
+- consultar atributos preenchidos do perfil;
+- sinalizar atributos nao preenchidos;
+- editar atributos de perfil em sessao autenticada;
+- persistir os atributos editados.
+
 ## Arquitetura
 
 O EasyAccept acessa o sistema por `br.ufal.ic.p2.jackut.Facade`. A facade e fina e delega os comandos para `services.JackutService`.
@@ -40,6 +47,16 @@ java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
 ```powershell
 java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
   br.ufal.ic.p2.jackut.Facade tests\us1_2.txt
+```
+
+```powershell
+java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
+  br.ufal.ic.p2.jackut.Facade tests\us2_1.txt
+```
+
+```powershell
+java -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
+  br.ufal.ic.p2.jackut.Facade tests\us2_2.txt
 ```
 
 Ou pela `Main`:

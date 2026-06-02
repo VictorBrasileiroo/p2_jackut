@@ -11,6 +11,8 @@ public class Main {
         String base = findTestBase();
         EasyAccept.main(new String[] {FACADE, base + "us1_1.txt"});
         EasyAccept.main(new String[] {FACADE, base + "us1_2.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us2_1.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us2_2.txt"});
     }
 
     private static String findTestBase() {
