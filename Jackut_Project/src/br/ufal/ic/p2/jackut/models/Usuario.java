@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class Usuario implements Serializable {
@@ -18,6 +20,7 @@ public class Usuario implements Serializable {
     private final Map<String, String> perfil;
     private Set<String> amigos;
     private Set<String> convitesEnviados;
+    private Queue<Recado> recadosRecebidos;
 
     public Usuario(String login, String senha, String nome) {
         this.login = login;
@@ -26,6 +29,7 @@ public class Usuario implements Serializable {
         this.perfil.put("nome", nome == null ? "" : nome);
         this.amigos = new LinkedHashSet<String>();
         this.convitesEnviados = new LinkedHashSet<String>();
+        this.recadosRecebidos = new LinkedList<Recado>();
     }
 
     public String getLogin() {
@@ -83,6 +87,21 @@ public class Usuario implements Serializable {
         return Collections.unmodifiableList(new ArrayList<String>(amigos));
     }
 
+    public void receberRecado(Recado recado) {
+        garantirRecados();
+        recadosRecebidos.add(recado);
+    }
+
+    public boolean possuiRecado() {
+        garantirRecados();
+        return !recadosRecebidos.isEmpty();
+    }
+
+    public Recado lerProximoRecado() {
+        garantirRecados();
+        return recadosRecebidos.poll();
+    }
+
     private void garantirRelacionamentos() {
         if (amigos == null) {
             amigos = new LinkedHashSet<String>();
@@ -90,6 +109,12 @@ public class Usuario implements Serializable {
 
         if (convitesEnviados == null) {
             convitesEnviados = new LinkedHashSet<String>();
+        }
+    }
+
+    private void garantirRecados() {
+        if (recadosRecebidos == null) {
+            recadosRecebidos = new LinkedList<Recado>();
         }
     }
 }

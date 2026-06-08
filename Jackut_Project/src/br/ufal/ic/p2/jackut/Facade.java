@@ -42,6 +42,14 @@ public class Facade {
         return service.getAmigos(login);
     }
 
+    public void enviarRecado(String id, String destinatario, String recado) {
+        service.enviarRecado(id, destinatario, recado);
+    }
+
+    public String lerRecado(String id) {
+        return service.lerRecado(id);
+    }
+
     public void encerrarSistema() {
         service.encerrarSistema();
     }

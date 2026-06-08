@@ -4,12 +4,15 @@ import br.ufal.ic.p2.jackut.exceptions.AmigoJaAdicionadoException;
 import br.ufal.ic.p2.jackut.exceptions.AmigoPendenteException;
 import br.ufal.ic.p2.jackut.exceptions.AtributoNaoPreenchidoException;
 import br.ufal.ic.p2.jackut.exceptions.AutoAmizadeException;
+import br.ufal.ic.p2.jackut.exceptions.AutoRecadoException;
 import br.ufal.ic.p2.jackut.exceptions.ContaExistenteException;
 import br.ufal.ic.p2.jackut.exceptions.LoginInvalidoException;
 import br.ufal.ic.p2.jackut.exceptions.LoginOuSenhaInvalidosException;
+import br.ufal.ic.p2.jackut.exceptions.SemRecadosException;
 import br.ufal.ic.p2.jackut.exceptions.SenhaInvalidaException;
 import br.ufal.ic.p2.jackut.exceptions.UsuarioNaoCadastradoException;
 import br.ufal.ic.p2.jackut.models.EstadoJackut;
+import br.ufal.ic.p2.jackut.models.Recado;
 import br.ufal.ic.p2.jackut.models.Sessao;
 import br.ufal.ic.p2.jackut.models.Usuario;
 import br.ufal.ic.p2.jackut.persistence.PersistenciaService;
@@ -128,6 +131,31 @@ public class JackutService {
 
         List<String> amigos = usuario.getAmigos();
         return "{" + String.join(",", amigos) + "}";
+    }
+
+    public void enviarRecado(String id, String loginDestinatario, String mensagem) {
+        Usuario remetente = buscarUsuarioPorSessao(id);
+        Usuario destinatario = usuarioRepository.buscarPorLogin(loginDestinatario);
+
+        if (destinatario == null) {
+            throw new UsuarioNaoCadastradoException();
+        }
+
+        if (remetente.getLogin().equals(loginDestinatario)) {
+            throw new AutoRecadoException();
+        }
+
+        destinatario.receberRecado(new Recado(remetente.getLogin(), mensagem));
+    }
+
+    public String lerRecado(String id) {
+        Usuario usuario = buscarUsuarioPorSessao(id);
+
+        if (!usuario.possuiRecado()) {
+            throw new SemRecadosException();
+        }
+
+        return usuario.lerProximoRecado().getMensagem();
     }
 
     private void validarLogin(String login) {
