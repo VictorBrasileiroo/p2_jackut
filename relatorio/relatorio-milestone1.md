@@ -423,7 +423,7 @@ O projeto evita caminhos absolutos. Essa decisao segue a recomendacao do enuncia
 
 ### 11.7 Documentacao Fora Do Codigo
 
-O codigo-fonte foi mantido sem comentarios e sem Javadocs, conforme a regra definida para este projeto. A documentacao de arquitetura, decisoes e funcionamento fica em arquivos externos, como `README.md` e este relatorio.
+O codigo-fonte usa Javadocs para documentar pacotes, classes e contratos publicos. Comentarios avulsos foram evitados para manter o codigo limpo. A documentacao de arquitetura, decisoes e funcionamento fica em arquivos externos, como `README.md` e este relatorio.
 
 ## 12. Padroes De Projeto Utilizados
 
@@ -547,7 +547,7 @@ O projeto segue alguns criterios de qualidade definidos para evitar os problemas
 - repositories escondem detalhes do estado interno;
 - exceptions concentram mensagens do contrato;
 - caminhos de arquivo sao relativos;
-- o codigo-fonte permanece sem comentarios e sem Javadocs;
+- o codigo-fonte possui Javadocs objetivos e evita comentarios avulsos;
 - a documentacao externa descreve a arquitetura real implementada.
 
 ## 14. Execucao E Verificacao

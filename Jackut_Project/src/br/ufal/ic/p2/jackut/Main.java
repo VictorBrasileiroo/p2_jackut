@@ -3,10 +3,28 @@ package br.ufal.ic.p2.jackut;
 import easyaccept.EasyAccept;
 import java.io.File;
 
+/**
+ * Ponto de entrada para execucao dos scripts de aceitacao do Jackut.
+ *
+ * <p>A classe localiza a pasta de testes por caminhos relativos e executa os
+ * scripts do milestone por meio do EasyAccept.</p>
+ */
 public class Main {
 
     private static final String FACADE = "br.ufal.ic.p2.jackut.Facade";
 
+    /**
+     * Impede instanciacao da classe de execucao.
+     */
+    private Main() {
+    }
+
+    /**
+     * Executa os scripts de aceitacao configurados para o milestone atual.
+     *
+     * @param args argumentos de linha de comando, nao utilizados pelo projeto
+     * @throws IllegalStateException quando a pasta de testes nao puder ser localizada
+     */
     public static void main(String[] args) {
         String base = findTestBase();
         EasyAccept.main(new String[] {FACADE, base + "us1_1.txt"});
@@ -19,6 +37,12 @@ public class Main {
         EasyAccept.main(new String[] {FACADE, base + "us4_2.txt"});
     }
 
+    /**
+     * Localiza a pasta dos scripts do EasyAccept a partir do diretorio de execucao.
+     *
+     * @return caminho relativo da pasta que contem os scripts de teste
+     * @throws IllegalStateException quando nenhum caminho conhecido contiver os testes
+     */
     private static String findTestBase() {
         if (new File("tests/us1_1.txt").exists()) {
             return "tests/";

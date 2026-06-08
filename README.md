@@ -41,6 +41,8 @@ java "-Dfile.encoding=UTF-8" -cp "out\verification;lib\easyaccept.jar" easyaccep
 
 ## Organizacao Do Codigo
 
+O codigo-fonte possui Javadocs em pacotes, classes e metodos publicos para documentar contratos, parametros, retornos e excecoes.
+
 ```text
 jackut_project/src/br/ufal/ic/p2/jackut/
 |-- Main.java
