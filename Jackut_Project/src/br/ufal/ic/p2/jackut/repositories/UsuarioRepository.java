@@ -2,6 +2,7 @@ package br.ufal.ic.p2.jackut.repositories;
 
 import br.ufal.ic.p2.jackut.models.EstadoJackut;
 import br.ufal.ic.p2.jackut.models.Usuario;
+import java.util.List;
 
 /**
  * Repository responsavel pelo acesso controlado aos usuarios do estado.
@@ -49,5 +50,23 @@ public class UsuarioRepository {
      */
     public Usuario buscarPorLogin(String login) {
         return estado.buscarUsuario(login);
+    }
+
+    /**
+     * Lista todos os usuarios cadastrados em ordem de criacao.
+     *
+     * @return lista com os usuarios cadastrados
+     */
+    public List<Usuario> listar() {
+        return estado.listarUsuarios();
+    }
+
+    /**
+     * Remove um usuario cadastrado.
+     *
+     * @param login login do usuario removido
+     */
+    public void remover(String login) {
+        estado.removerUsuario(login);
     }
 }

@@ -35,6 +35,16 @@ public class Main {
         EasyAccept.main(new String[] {FACADE, base + "us3_2.txt"});
         EasyAccept.main(new String[] {FACADE, base + "us4_1.txt"});
         EasyAccept.main(new String[] {FACADE, base + "us4_2.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us5_1.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us5_2.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us6_1.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us6_2.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us7_1.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us7_2.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us8_1.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us8_2.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us9_1.txt"});
+        EasyAccept.main(new String[] {FACADE, base + "us9_2.txt"});
     }
 
     /**

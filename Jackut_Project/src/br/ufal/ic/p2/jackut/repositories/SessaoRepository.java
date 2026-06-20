@@ -56,4 +56,20 @@ public class SessaoRepository {
         sessoes.clear();
         proximoId = 1;
     }
+
+    /**
+     * Remove sessoes associadas a um usuario.
+     *
+     * @param login login do usuario removido
+     */
+    public void removerPorUsuario(String login) {
+        Map<String, Sessao> mantidas = new LinkedHashMap<String, Sessao>();
+        for (Map.Entry<String, Sessao> entry : sessoes.entrySet()) {
+            if (!login.equals(entry.getValue().getLoginUsuario())) {
+                mantidas.put(entry.getKey(), entry.getValue());
+            }
+        }
+        sessoes.clear();
+        sessoes.putAll(mantidas);
+    }
 }

@@ -10,7 +10,7 @@ Projeto da disciplina de Programação 2 (UFAL/IC). Jackut e uma rede de relacio
 
 ## Funcionalidades Entregues
 
-O estado atual cobre as User Stories 1 a 4.
+O estado atual cobre as User Stories 1 a 9.
 
 | User Story | Funcionalidades principais |
 | --- | --- |
@@ -18,6 +18,11 @@ O estado atual cobre as User Stories 1 a 4.
 | US2 | Edicao de perfil, consulta de atributos preenchidos e tratamento de atributos inexistentes |
 | US3 | Convite de amizade, confirmacao por adicao reciproca, consulta e listagem de amigos |
 | US4 | Envio de recados, leitura em ordem de chegada, remocao apos leitura e persistencia dos recados pendentes |
+| US5 | Criacao de comunidades, dono, descricao, membros iniciais e persistencia |
+| US6 | Entrada de usuarios em comunidades e listagem das comunidades de cada usuario |
+| US7 | Envio e leitura de mensagens de comunidade, separadas dos recados privados |
+| US8 | Relacionamentos de fa-idolo, paquera e inimizade, com regras de bloqueio e recados automaticos |
+| US9 | Remocao de conta, incluindo limpeza de comunidades, amizades, recados, mensagens e relacionamentos |
 
 ## Execucao
 
@@ -41,22 +46,32 @@ java "-Dfile.encoding=UTF-8" -cp "out\verification;lib\easyaccept.jar" easyaccep
 
 ## Organizacao Do Codigo
 
-O codigo-fonte possui Javadocs em pacotes, classes e metodos publicos para documentar contratos, parametros, retornos e excecoes.
+O codigo-fonte possui Javadocs em pacotes, classes e metodos publicos para documentar contratos, parametros, retornos e excecoes. As excecoes de dominio sao checked exceptions, por meio de `JackutException extends Exception`.
 
 ```text
 jackut_project/src/br/ufal/ic/p2/jackut/
 |-- Main.java
 |-- Facade.java
 |-- services/
-|   `-- JackutService.java
+|   |-- JackutApplication.java
+|   |-- SistemaService.java
+|   |-- UsuarioService.java
+|   |-- SessaoService.java
+|   |-- AmizadeService.java
+|   |-- RecadoService.java
+|   |-- ComunidadeService.java
+|   `-- RelacionamentoService.java
 |-- repositories/
+|   |-- UsuarioRepository.java
 |   |-- SessaoRepository.java
-|   `-- UsuarioRepository.java
+|   `-- ComunidadeRepository.java
 |-- models/
 |   |-- EstadoJackut.java
-|   |-- Recado.java
+|   |-- Usuario.java
 |   |-- Sessao.java
-|   `-- Usuario.java
+|   |-- Recado.java
+|   |-- Mensagem.java
+|   `-- Comunidade.java
 |-- persistence/
 |   `-- PersistenciaService.java
 `-- exceptions/
@@ -66,17 +81,18 @@ jackut_project/src/br/ufal/ic/p2/jackut/
 
 ## Funcionamento Geral
 
-O EasyAccept acessa o sistema por `br.ufal.ic.p2.jackut.Facade`. A `Facade` expoe apenas os comandos esperados pelos testes e delega as operacoes para `JackutService`.
+O EasyAccept acessa o sistema por `br.ufal.ic.p2.jackut.Facade`. A `Facade` expoe apenas os comandos esperados pelos testes e delega as operacoes para `JackutApplication`.
 
 O fluxo principal e:
 
 ```text
-EasyAccept -> Facade -> JackutService -> repositories -> models
-                                      -> persistence
-                                      -> exceptions
+EasyAccept -> Facade -> JackutApplication -> services -> repositories -> models
+                                               |
+                                               v
+                                           persistence
 ```
 
-`JackutService` coordena os casos de uso. Os repositories controlam acesso a usuarios e sessoes. Os models guardam as regras e o estado do dominio. A persistencia fica isolada em `PersistenciaService`, usando arquivo relativo em `dados/jackut.ser` ou em uma pasta equivalente localizada automaticamente.
+`JackutApplication` monta as dependencias e coordena apenas operacoes transversais, como remocao de conta. As regras de usuario, sessao, amizade, recado, comunidade e relacionamentos ficam em services menores. Os repositories controlam acesso ao estado. Os models guardam regras e dados do dominio. A persistencia fica isolada em `PersistenciaService`, usando arquivo relativo em `dados/jackut.ser` ou em uma pasta equivalente localizada automaticamente.
 
 ## Responsabilidades Principais
 
@@ -84,79 +100,69 @@ EasyAccept -> Facade -> JackutService -> repositories -> models
 | --- | --- |
 | `Main` | Localizar a pasta de testes e executar os scripts do EasyAccept |
 | `Facade` | Servir como entrada publica dos testes e delegar os comandos |
-| `JackutService` | Coordenar criacao de conta, sessao, perfil, amizade, recados e persistencia |
-| `UsuarioRepository` | Consultar e registrar usuarios no estado do sistema |
-| `SessaoRepository` | Criar, consultar e limpar sessoes abertas em memoria |
-| `EstadoJackut` | Agrupar o estado persistente do sistema |
-| `Usuario` | Proteger login, senha, perfil, amigos, convites e recados |
-| `Recado` | Representar uma mensagem recebida por um usuario |
-| `PersistenciaService` | Carregar, salvar e apagar o estado serializado |
+| `JackutApplication` | Montar dependencias e coordenar fluxos transversais |
+| `UsuarioService` | Criar conta, editar perfil e consultar atributos |
+| `SessaoService` | Abrir sessoes e localizar usuarios autenticados |
+| `AmizadeService` | Solicitar, confirmar, verificar e listar amizades |
+| `RecadoService` | Enviar e ler recados privados |
+| `ComunidadeService` | Criar comunidades, adicionar membros e enviar mensagens coletivas |
+| `RelacionamentoService` | Controlar idolos, fas, paqueras e inimigos |
+| `SistemaService` | Zerar, encerrar e persistir estado |
+| `EstadoJackut` | Agrupar usuarios e comunidades persistentes |
+| `Usuario` | Proteger perfil, comunidades, amizades, recados, mensagens e relacionamentos |
+| `Comunidade` | Proteger nome, descricao, dono e membros |
 | `exceptions` | Concentrar erros de dominio com mensagens exigidas pelos testes |
 
 ## Regras Implementadas
 
-### Contas E Sessoes
+### Contas, Perfil E Sessoes
 
-`criarUsuario` valida login e senha antes de registrar uma nova conta. `abrirSessao` autentica login e senha e cria uma sessao em memoria. As operacoes protegidas usam o id da sessao para localizar o usuario autenticado.
+`criarUsuario` valida login e senha antes de registrar uma nova conta. `abrirSessao` autentica login e senha e cria uma sessao em memoria. As operacoes protegidas usam o id da sessao para localizar o usuario autenticado. O perfil continua dinamico, permitindo criar ou alterar atributos por `editarPerfil`.
 
-### Perfil
+### Amizades E Recados
 
-O perfil do usuario e dinamico. O atributo `nome` e criado junto com a conta, e outros atributos podem ser adicionados ou alterados por `editarPerfil`. Consultas a atributos ausentes resultam em erro de dominio.
+Uma amizade so e confirmada por adicao reciproca. Recados privados sao enviados de um usuario para outro e lidos em ordem de chegada. Inimizades bloqueiam tentativas de amizade e envio de recado para quem marcou o remetente como inimigo.
 
-### Amizades
+### Comunidades E Mensagens
 
-Uma amizade so e confirmada quando ha adicao reciproca. A primeira chamada de `adicionarAmigo` registra um convite pendente. Quando o outro usuario adiciona de volta, o convite e removido e a amizade passa a existir para os dois lados.
+Comunidades possuem nome unico, descricao, dono e membros. O dono entra como primeiro membro. Usuarios podem participar de varias comunidades, mantendo ordem de entrada. Mensagens enviadas a comunidades chegam a todos os membros que nao bloquearam o remetente por inimizade. Mensagens de comunidade e recados privados possuem filas separadas.
 
-### Recados
+### Novos Relacionamentos
 
-`enviarRecado` adiciona uma mensagem na fila do destinatario. `lerRecado` remove e retorna o primeiro recado recebido, preservando a ordem de chegada. Enviar recado para si mesmo e tentar ler uma fila vazia geram erros especificos.
+O relacionamento fa-idolo e publico: `getFas` lista quem adicionou o usuario como idolo. Paqueras sao privadas para quem adicionou; quando ha reciprocidade, o sistema envia recados automaticos aos dois usuarios. Inimizades impedem que o usuario bloqueado adicione o outro como amigo, idolo ou paquera, e tambem impedem recados diretos.
 
-## Mensagens De Erro
+### Remocao De Conta
 
-| Erro | Mensagem do contrato |
-| --- | --- |
-| Login invalido | `Login inválido.` |
-| Senha invalida | `Senha inválida.` |
-| Conta existente | `Conta com esse nome já existe.` |
-| Login ou senha invalidos | `Login ou senha inválidos.` |
-| Usuario nao cadastrado | `Usuário não cadastrado.` |
-| Atributo nao preenchido | `Atributo não preenchido.` |
-| Auto-adicao de amizade | `Usuário não pode adicionar a si mesmo como amigo.` |
-| Amigo ja confirmado | `Usuário já está adicionado como amigo.` |
-| Convite pendente | `Usuário já está adicionado como amigo, esperando aceitação do convite.` |
-| Auto-envio de recado | `Usuário não pode enviar recado para si mesmo.` |
-| Sem recados | `Não há recados.` |
-
-As mensagens sao mantidas em excecoes especificas para evitar duplicacao de strings de erro na logica de negocio.
+`removerUsuario` remove a conta associada a uma sessao e limpa suas referencias: perfil, amizades, convites, comunidades criadas, participacao em comunidades, recados enviados, mensagens enviadas e relacionamentos.
 
 ## Escolhas De Design
 
-O sistema usa um objeto de estado (`EstadoJackut`) para persistir os dados de forma coesa. O estado nao e manipulado diretamente pela `Facade`; o acesso passa por repositories e pelo service de aplicacao.
+O sistema usa `EstadoJackut` como snapshot persistente de usuarios e comunidades. O acesso passa por repositories para evitar manipulacao livre dos mapas internos.
 
-Usuarios sao identificados por login unico. O perfil usa um mapa para permitir atributos dinamicos. Amigos e convites usam conjuntos ordenados para evitar duplicidade sem perder a ordem esperada pelos testes. Recados ficam em fila, pois a leitura deve seguir o comportamento FIFO.
+A camada de aplicacao foi dividida por area funcional para evitar concentrar regras em uma unica classe. Essa divisao responde ao feedback do milestone 1 sobre modularidade e separacao de responsabilidades.
 
-As sessoes ficam apenas em memoria, enquanto usuarios, perfil, amizades e recados pendentes sao salvos quando o sistema e encerrado.
+As excecoes especificas continuam representando os erros do dominio, mas agora herdam de `JackutException`, que por sua vez herda de `Exception`. Isso atende ao padrao solicitado de excecoes verificadas sem voltar ao problema de `throws Exception` generico.
 
 ## Padroes Presentes
 
 ### Facade
 
-A `Facade` oferece uma interface unica para o EasyAccept. Ela reduz o acoplamento entre os scripts de teste e a organizacao interna do sistema, mantendo os comandos publicos estaveis mesmo quando a implementacao evolui.
+A `Facade` oferece uma interface unica para o EasyAccept e preserva os nomes dos comandos dos scripts.
 
 ### Service Layer
 
-`JackutService` concentra a coordenacao dos casos de uso. Ele valida o fluxo entre repositories, models e persistencia sem transformar a `Facade` em uma classe com regra de negocio.
+Os services organizam casos de uso por area funcional. Isso reduz acoplamento e evita que uma unica classe acumule usuario, sessao, amizade, recado, comunidade e relacionamentos.
 
 ### Repository
 
-`UsuarioRepository` e `SessaoRepository` isolam a forma como usuarios e sessoes sao localizados. Isso evita que outras camadas manipulem diretamente mapas ou detalhes internos do armazenamento.
+`UsuarioRepository`, `SessaoRepository` e `ComunidadeRepository` isolam o acesso ao estado e as colecoes internas.
 
 ### Domain Model
 
-As entidades do dominio possuem comportamento proprio. `Usuario` altera perfil, controla convites, confirma amigos e gerencia sua fila de recados sem expor colecoes mutaveis para modificacao externa.
+`Usuario` e `Comunidade` possuem comportamento proprio e protegem suas colecoes internas contra alteracao externa.
 
 ### State Snapshot
 
-`EstadoJackut` representa um retrato serializavel do sistema. Essa decisao simplifica o carregamento, o salvamento e a limpeza do estado sem misturar persistencia com regra de negocio.
+`EstadoJackut` representa o estado persistente do sistema e permite salvar/carregar usuarios, comunidades, recados, mensagens e relacionamentos como uma unidade.
 
 ---

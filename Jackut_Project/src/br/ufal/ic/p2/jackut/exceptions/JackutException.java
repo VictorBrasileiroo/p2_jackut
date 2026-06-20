@@ -6,7 +6,7 @@ package br.ufal.ic.p2.jackut.exceptions;
  * <p>As excecoes especificas do sistema herdam desta classe para manter um
  * tipo comum de falha de negocio.</p>
  */
-public class JackutException extends RuntimeException {
+public class JackutException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
