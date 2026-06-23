@@ -6,6 +6,8 @@ Matrícula: 202407269
 
 Projeto da disciplina de Programação 2 (UFAL/IC). Jackut e uma rede de relacionamentos implementada em Java para execucao dos testes de aceitacao do EasyAccept.
 
+Entrega atual: Milestone 2, com as User Stories 1 a 9 implementadas.
+
 ---
 
 ## Funcionalidades Entregues
@@ -37,12 +39,32 @@ javac -encoding UTF-8 -cp "lib\easyaccept.jar" -d "out\verification" `
 java "-Dfile.encoding=UTF-8" -cp "out\verification;lib\easyaccept.jar" br.ufal.ic.p2.jackut.Main
 ```
 
+Para gerar os Javadocs:
+
+```powershell
+javadoc -quiet -encoding UTF-8 -charset UTF-8 -classpath "lib\easyaccept.jar" `
+  -d "out\javadoc" `
+  (Get-ChildItem -Path "src" -Recurse -Filter "*.java").FullName
+```
+
 Tambem e possivel executar um script especifico do EasyAccept:
 
 ```powershell
 java "-Dfile.encoding=UTF-8" -cp "out\verification;lib\easyaccept.jar" easyaccept.EasyAccept `
   br.ufal.ic.p2.jackut.Facade tests\us1_1.txt
 ```
+
+## Documentacao Da Entrega
+
+Os documentos principais da entrega sao:
+
+| Arquivo | Papel |
+| --- | --- |
+| `README.md` | Visao geral do projeto, execucao, arquitetura e principais escolhas |
+| `AGENTS.md` | Guia de trabalho e checklist de qualidade para manutencao do projeto |
+| `.config/DOCS_BASE.md` | Base do enunciado, criterios de avaliacao e anotacoes de feedback |
+| `.config/GUIA_BOAS_PRATICAS.md` | Regras de design, encapsulamento, excecoes e revisao |
+| `relatorio/relatorio-milestone2.md` | Relatorio do Milestone 2 com arquitetura, fluxos, padroes e verificacao |
 
 ## Organizacao Do Codigo
 
@@ -164,5 +186,9 @@ Os services organizam casos de uso por area funcional. Isso reduz acoplamento e 
 ### State Snapshot
 
 `EstadoJackut` representa o estado persistente do sistema e permite salvar/carregar usuarios, comunidades, recados, mensagens e relacionamentos como uma unidade.
+
+### Checked Exceptions
+
+As excecoes especificas de dominio herdam de `JackutException`, que herda de `Exception`. Isso evita `RuntimeException` para erros esperados pelo contrato e deixa explicito quais operacoes podem falhar por regra de negocio.
 
 ---
