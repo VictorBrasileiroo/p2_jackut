@@ -61,9 +61,6 @@ Os documentos principais da entrega sao:
 | Arquivo | Papel |
 | --- | --- |
 | `README.md` | Visao geral do projeto, execucao, arquitetura e principais escolhas |
-| `AGENTS.md` | Guia de trabalho e checklist de qualidade para manutencao do projeto |
-| `.config/DOCS_BASE.md` | Base do enunciado, criterios de avaliacao e anotacoes de feedback |
-| `.config/GUIA_BOAS_PRATICAS.md` | Regras de design, encapsulamento, excecoes e revisao |
 | `relatorio/relatorio-milestone2.md` | Relatorio do Milestone 2 com arquitetura, fluxos, padroes e verificacao |
 
 ## Organizacao Do Codigo
